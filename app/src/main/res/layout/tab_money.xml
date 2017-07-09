@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:alpha="1"
+    >
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentTop="true"
+        android:id="@+id/country"
+
+        >
+        <Spinner
+            android:id="@+id/spn_coutry"
+            android:layout_width="72dp"
+            android:layout_height="56dp"
+            android:popupBackground="@drawable/round_corner"
+            android:background="@drawable/dropdown_round"
+            android:entries="@array/country"
+            android:elevation="5dp"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:paddingLeft="8dp"
+            ></Spinner>
+        <EditText
+            android:maxLength="10"
+            android:gravity="right"
+            android:textColor="@color/primary_text"
+            android:textSize="28dp"
+            android:alpha="0.6"
+            android:id="@+id/edt_money"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:inputType="number"
+            android:cursorVisible="false"
+            android:elevation="5dp"
+            android:hint="@string/input_money"
+            android:paddingRight="16dp"
+            android:textColorHint="@color/accent"
+            />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/divider"
+        android:paddingLeft="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_below="@+id/country"
+        android:layout_alignParentStart="true"
+        android:background="@color/divider"
+        android:textColor="#ffffff"
+        android:text="@string/divider_text"
+        android:textStyle="bold"
+        android:gravity="center_vertical"
+
+         />
+
+   <ListView
+       android:background="#ffffff"
+       android:id="@+id/list_result"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:divider="@color/divider"
+       android:paddingTop="16dp"
+       android:layout_alignParentBottom="true"
+       android:layout_alignParentStart="true"
+       android:layout_below="@+id/divider">
+   </ListView>
+</RelativeLayout>

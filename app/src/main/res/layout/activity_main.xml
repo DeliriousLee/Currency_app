@@ -1,0 +1,66 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    >
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@color/primary"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:orientation="horizontal"
+            android:elevation="5dp"
+            android:weightSum="1"
+            android:id="@+id/tab_top"
+            android:gravity="center"
+            >
+
+
+                <Button
+                    android:id="@+id/btn_money"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/tab_money"
+                    android:textSize="16dp"
+                    android:textColor="#ffffff"
+                    android:background="@color/primary"
+                    android:layout_weight="0.33" />
+                <Button
+                    android:id="@+id/btn_change"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:textSize="16dp"
+                    android:text="@string/tab_change"
+                    android:textColor="#ffffff"
+                    android:background="@color/primary"
+                    android:layout_weight="0.33"
+                    />
+
+            <Button
+                android:id="@+id/btn_records"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="0.33"
+                android:textSize="16dp"
+                android:background="@color/primary"
+                android:text="查询记录"
+
+                android:textColor="#ffffff" />
+
+        </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/id_content"
+        android:layout_below="@+id/tab_top"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
+
+</RelativeLayout>
+

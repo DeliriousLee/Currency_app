@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="#ffffff">
+   <LinearLayout
+       android:id="@+id/Lin_search"
+       android:layout_width="match_parent"
+       android:layout_height="72dp"
+       android:orientation="horizontal"
+       android:background="#ffffff"
+       android:paddingRight="16dp">
+
+       <TextView
+
+           android:background="@color/primary_dark"
+           android:id="@+id/textView3"
+           android:layout_width="70dp"
+           android:layout_height="84dp"
+           android:layout_gravity="center"
+           android:gravity="center"
+           android:textColor="#fff"
+           android:text="RESEARCH"
+           android:textStyle="bold"
+           android:textSize="12dp"/>
+
+       <EditText
+           android:id="@+id/edt_records"
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:hint="请输入查询条件"
+           android:textColorHint="#bdbdbd"
+           android:textColor="#000"
+           android:paddingRight="16dp"
+           android:textSize="20dp"
+           android:gravity="right"
+           android:inputType="textCapCharacters"
+        />
+   </LinearLayout>
+
+        <TextView
+            android:id="@+id/txt_search"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@color/primary"
+            android:layout_below="@+id/Lin_search"
+            android:text="查询结果"
+            android:paddingLeft="16dp"
+            android:textSize="18dp"
+            android:gravity="center_vertical"
+            android:elevation="5dp"
+            android:textColor="#ffffff"/>
+
+
+    <ListView
+        android:id="@+id/list_records"
+        android:layout_below="@+id/txt_search"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></ListView>
+</RelativeLayout>

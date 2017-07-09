@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="country">
+        <item>AUD/澳元</item>
+        <item>CAD/加元</item>
+        <item>CNY/人民币</item>
+        <item>EUR/欧元</item>
+        <item>GBP/英镑</item>
+        <item>HKD/港元</item>
+        <item>JPY/日元</item>
+        <item>SUR/卢布</item>
+        <item>USD/美元</item>
+
+    </string-array>
+
+    <string-array name="countryPic">
+        <item>@drawable/aud</item>
+        <item>@drawable/cad</item>
+        <item>@drawable/cny</item>
+        <item>@drawable/eur</item>
+        <item>@drawable/gbp</item>
+        <item>@drawable/hkd</item>
+        <item>@drawable/jpy</item>
+        <item>@drawable/rub</item>
+        <item>@drawable/usd</item>
+     </string-array>
+</resources>

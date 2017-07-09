@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">理财</string>
+    <string name="text_money">币种</string>
+    <string name="button_money">兑换</string>
+    <string name="put_money">输入金额</string>
+    <string name="tab_money">汇率</string>
+    <string name="tab_change">变化曲线</string>
+    <string name="divider_text">换算货币</string>
+    <string name="input_money"><font size="14">输入金额</font></string>
+</resources>
