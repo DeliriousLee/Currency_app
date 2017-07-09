@@ -24,9 +24,7 @@ public class JSONParser {
     static InputStream sInputStream = null;
     static JSONObject sReturnJsonObject = null;
     static String sRawJsonString = "";
-    public JSONParser() {
-
-    }
+    public JSONParser() {}
     public JSONObject getJSONFromUrl(String url) {
 //attempt to get response from server
         try {
@@ -46,15 +44,17 @@ public class JSONParser {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     sInputStream, "iso-8859-1"), 8);
+            //字符串变量（非线程安全）StringBuilder
             StringBuilder stringBuilder = new StringBuilder();
             String line = null;
             while ((line = reader.readLine()) != null) {
+                //将缓存区中逐行读入数据并在后面加上换行标记
                 stringBuilder.append(line + "\n");
             }
             sInputStream.close();
             sRawJsonString = stringBuilder.toString();
         } catch (Exception e) {
-            Log.e("Error reading Buffer: " + e.toString(), this.getClass().getSimpleName());
+            Log.e("Error: " + e.toString(), this.getClass().getSimpleName());
         }
         try {
             sReturnJsonObject = new JSONObject(sRawJsonString);
@@ -62,7 +62,6 @@ public class JSONParser {
             Log.e("Parser", "Error when parsing data " + e.toString());
         }
 //return json object
-        return sReturnJsonObject;
+        return sReturnJsonObject;//进行格式化后返回json
     }
 }
-
