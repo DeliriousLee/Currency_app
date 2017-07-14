@@ -12,7 +12,11 @@
         <item>USD/美元</item>
 
     </string-array>
-
+    <string-array name="search_item">
+        <item>全部</item>
+        <item>货币码查询</item>
+        <item>国家名查询</item>
+    </string-array>
     <string-array name="countryPic">
         <item>@drawable/aud</item>
         <item>@drawable/cad</item>

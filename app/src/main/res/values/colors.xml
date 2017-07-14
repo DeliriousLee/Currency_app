@@ -9,5 +9,7 @@
     <color name="icons">#FFFFFF</color>
     <color name="divider">#BDBDBD</color>
     <color name="edttext">#d2d2d2</color>
+    <color name="cherry_dark">#a50e21</color>
+    <color name="cherry">#f4264a</color>
 </resources>
 

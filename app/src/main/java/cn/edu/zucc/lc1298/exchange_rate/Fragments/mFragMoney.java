@@ -1,8 +1,14 @@
 package cn.edu.zucc.lc1298.exchange_rate.Fragments;
 
+import android.app.ProgressDialog;
+import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.res.AssetManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -21,12 +27,17 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cn.edu.zucc.lc1298.exchange_rate.Adapter.CountryAdapter;
 import cn.edu.zucc.lc1298.exchange_rate.Control.JSONParser;
+import cn.edu.zucc.lc1298.exchange_rate.Control.mSQLHelper;
 import cn.edu.zucc.lc1298.exchange_rate.Model.Countries;
 import cn.edu.zucc.lc1298.exchange_rate.Model.Country;
 import cn.edu.zucc.lc1298.exchange_rate.Model.Currency;
@@ -47,47 +58,77 @@ public class mFragMoney extends Fragment {
     private EditText edtMoney;
     private View FrgMoney;
     private List<Country>countryList=new ArrayList<Country>();
+    private static int recordId = 0;
 
+    private mSQLHelper dbhelper=null;
+    private SQLiteDatabase db=null;
 
     public static Country current_country;
     public static final String RATES = "rates";
 
-    CountryAdapter adapter;
+    CountryAdapter adapter=null;
     public static final String SELECTED="SELECTED_CURRENCY";
+
 
     //this will contain my developers key
     private String mKey;
     //used to fetch the 'rates' json object from openexchangerates.org
     public static final String URL_BASE = "http://openexchangerates.org/api/latest.json?app_id=";
 
+    private static final int UPDATE_RATES=1;
+     Timer timer = new Timer();
+    TimerTask task = new TimerTask() {
 
-
+        @Override
+        public void run() {
+            // 需要做的事:发送消息
+            Message message = new Message();
+            message.what = UPDATE_RATES;
+            handler.sendMessage(message);
+        }
+    };
+    Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+           switch (msg.what){
+               case UPDATE_RATES:
+                  new UpdateRatesTask().execute(URL_BASE+mKey);
+                   break;
+           }
+        }
+    };
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         FrgMoney=inflater.inflate(R.layout.tab_money,container,false);
         mKey = getKey("open_key");
+        adapter=new CountryAdapter(this.getContext(),R.layout.list_item,countryList);
         initView();
         if(countryList!=null)
             countryList.clear();
         initCurrentCountry();
-        new FetchRatesTask().execute(URL_BASE+mKey);
         initCountry();
+        initDatabase();
         initEvent();
         if(savedInstanceState==null){
-            spCountry.setSelection(0);
-            PrefsMgr.setString(this.getContext(), SELECTED,spCountry.getSelectedItem().toString().substring(0,2));
+           spCountry.setSelection(0);
+
         }
 
-        adapter=new CountryAdapter(this.getContext(),R.layout.list_item,countryList);
+
         listCountry.setAdapter(adapter);
+        timer.schedule(task,1000,100000);
         return FrgMoney;
     }
 
     private void initCountry(){
         //初始化器会将初始化完成放入数据（货币ID，国家名，货币字母，图片）
-        Toast.makeText(getContext(),"数据0",Toast.LENGTH_SHORT).show();
+
        countries=new Countries();
        countryList=Countries.addCountriesList(countryList,countries);
+    }
+    private void initDatabase(){
+        dbhelper=new mSQLHelper(getContext());
+        db=dbhelper.getWritableDatabase();
     }
     private void initEvent(){
         spCountry.setOnItemSelectedListener( new itemSelectedListener());
@@ -128,29 +169,18 @@ public class mFragMoney extends Fragment {
     }
 
 
-    public void initCurrentCountry_temp(){
-        current_country.currency.toAUD=0.6;
-        current_country.currency.toCAD=3.2;
-        current_country.currency.toCNY=1.6;
-        current_country.currency.toEUR=0.7;
-        current_country.currency.toGBP=0.4;
-        current_country.currency.toHKD=0.2;
-        current_country.currency.toJPY=0.8;
-        current_country.currency.toRUB=0.5;
-        current_country.currency.toUSD=0.3;
-        }
+
     private void initCurrentCountry(){
         current_country=new Country();
         current_country.setCountryId(0);
         current_country.currency=new Currency();
-        //initCurrentCountry_temp();
+
     }
     private void removeIncorrect(int position){
         countryList.clear();
-        if(position!=0) {
-            countries.AUD.setStr_currency("");
-            countryList.add(countries.AUD);
-        }
+        if(position!=0)
+         countryList.add(countries.AUD);
+
         if(position!=1)
         countryList.add(countries.CAD);
         if(position!=2)
@@ -169,13 +199,14 @@ public class mFragMoney extends Fragment {
         countryList.add(countries.USD);
 
     }
+
     private String getKey(String keyName){
         //从Bundle
         // appid初始化
         AssetManager assetManager = this.getResources().getAssets();
         Properties properties = new Properties();
         try {
-            InputStream inputStream = assetManager.open("keys.properties");
+            InputStream inputStream = assetManager.open("key.properties");
             properties.load(inputStream);
 
         } catch (IOException e) {
@@ -193,78 +224,60 @@ public class mFragMoney extends Fragment {
                 case 0:
                     mFragMoney.current_country.setCountryId(0);
                     mFragMoney.current_country.setMoneyCode("AUD");
-
+                    mFragMoney.current_country.setCountryName("澳元");
                           removeIncorrect(0);
-                    PrefsMgr.setString(getContext(), SELECTED,"AUD");
-
                      break;
                 case 1:
                     mFragMoney.current_country.setCountryId(1);
                     mFragMoney.current_country.setMoneyCode("CAD");
-
+                    mFragMoney.current_country.setCountryName("加元");
                     removeIncorrect(1);
-                    PrefsMgr.setString(getContext(), SELECTED,"CAD");
-
-
-
-                     //   }
-                  //  }).start();
                     break;
                 case 2:
                     mFragMoney.current_country.setCountryId(2);
                     mFragMoney.current_country.setMoneyCode("CNY");
-
-                            removeIncorrect(2);
-                    PrefsMgr.setString(getContext(), SELECTED,"CNY");
+                    mFragMoney.current_country.setCountryName("人民币");
+                    removeIncorrect(2);
                     break;
                 case 3:
                     mFragMoney.current_country.setCountryId(3);
                     mFragMoney.current_country.setMoneyCode("EUR");
-                     removeIncorrect(3);
-                    PrefsMgr.setString(getContext(), SELECTED,"EUR");
-
+                    mFragMoney.current_country.setCountryName("欧元");
+                    removeIncorrect(3);
                     break;
                 case 4:
                     mFragMoney.current_country.setCountryId(4);
                     mFragMoney.current_country.setMoneyCode("GBP");
-
-                            removeIncorrect(4);
-                    PrefsMgr.setString(getContext(), SELECTED,"GBP");
-
+                    mFragMoney.current_country.setCountryName("英镑");
+                    removeIncorrect(4);
                     break;
                 case 5:
                     mFragMoney.current_country.setCountryId(5);
                     mFragMoney.current_country.setMoneyCode("HKD");
-                          removeIncorrect(5);
-                    PrefsMgr.setString(getContext(), SELECTED,"HKD");
-
+                    mFragMoney.current_country.setCountryName("港元");
+                    removeIncorrect(5);
                     break;
                 case 6:
                     mFragMoney.current_country.setCountryId(6);
                     mFragMoney.current_country.setMoneyCode("JPY");
-
-                            removeIncorrect(6);
-                    PrefsMgr.setString(getContext(), SELECTED,"JPY");
-
+                    mFragMoney.current_country.setCountryName("日元");
+                    removeIncorrect(6);
                     break;
                 case 7:
                     mFragMoney.current_country.setCountryId(7);
                     mFragMoney.current_country.setMoneyCode("RUB");
-
-                            removeIncorrect(7);
-                    PrefsMgr.setString(getContext(), SELECTED,"RUB");
-                     break;
+                    mFragMoney.current_country.setCountryName("卢布");
+                    removeIncorrect(7);
+                    break;
                 case 8:
                     mFragMoney.current_country.setCountryId(8);
                     mFragMoney.current_country.setMoneyCode("USD");
-
-                            removeIncorrect(8);
-                    PrefsMgr.setString(getContext(), SELECTED,"USD");
-
-                     break;
+                    mFragMoney.current_country.setCountryName("美元");
+                    removeIncorrect(8);
+                    break;
                 }
-                    System.out.print("shuju2");
-                    Toast.makeText(getContext(), "有数据1",Toast.LENGTH_SHORT).show();
+
+
                     new FetchRatesTask().execute(URL_BASE+mKey);
                     adapter.notifyDataSetChanged();
         }
@@ -274,13 +287,65 @@ public class mFragMoney extends Fragment {
 
         }
     }
+    class UpdateRatesTask extends AsyncTask<String,Void,JSONObject>{
+
+        @Override
+        protected void onPostExecute(JSONObject jsonObject) {
+            try {
+                if (jsonObject == null) {
+                    throw new JSONException("no data available.");
+                }
+                JSONObject jsonRates = jsonObject.getJSONObject(RATES);
+                double rates=jsonRates.getDouble("CNY")/jsonRates.getDouble("USD");
+                ContentValues currency=new ContentValues();
+                currency.put("currency",rates);
+
+                currency.put("recordId",recordId++);
+
+                SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                Date curDate = new Date(System.currentTimeMillis());//获取当前时间
+                String date = sDateFormat.format(curDate);
+                currency.put("currencyTime",date);
+                db.insert("currencyRecords",null,currency);
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        protected JSONObject doInBackground(String... params) {
+            JSONParser temp= new JSONParser();
+            JSONObject result=new JSONObject();
+            result=temp.getJSONFromUrl(params[0]);
+            return result;
+        }
+    }
     class FetchRatesTask extends AsyncTask<String, Void, JSONObject> {
+        private ProgressDialog progressDialog;
+        @Override
+        protected void onPreExecute() {
+            progressDialog = new ProgressDialog(getContext());
+            progressDialog.setTitle("Getting Curreny...");
+            progressDialog.setMessage("One moment please...");
+            progressDialog.setCancelable(true);
+            progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE,
+                    "Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            FetchRatesTask.this.cancel(true);
+                            progressDialog.dismiss();
+                        }
+                    });
+            progressDialog.show();
+        }
 
         @Override
         protected JSONObject doInBackground(String... params) {
             //String... excludeProperty表示不定参数，也就是调用这个方法的时候这里可以传入多个String对象
-
-            return new JSONParser().getJSONFromUrl(params[0]);
+            JSONParser temp= new JSONParser();
+            JSONObject result=new JSONObject();
+            result=temp.getJSONFromUrl(params[0]);
+            return result;
         }
 
         @Override
@@ -290,18 +355,29 @@ public class mFragMoney extends Fragment {
                 if (jsonObject == null) {
                     throw new JSONException("no data available.");
                 }
-                Toast.makeText(getContext(), "有数据2",Toast.LENGTH_SHORT).show();
+
                 JSONObject jsonRates = jsonObject.getJSONObject(RATES);
 
-                current_country.currency.toAUD=jsonRates.getDouble(current_country.moneyCode)/jsonRates.getDouble("AUD");
-                current_country.currency.toCAD=jsonRates.getDouble(current_country.moneyCode)/jsonRates.getDouble("CAD");
-                current_country.currency.toCNY=jsonRates.getDouble(current_country.moneyCode)/jsonRates.getDouble("CNY");
-                current_country.currency.toEUR=jsonRates.getDouble(current_country.moneyCode)/jsonRates.getDouble("EUR");
-                current_country.currency.toGBP=jsonRates.getDouble(current_country.moneyCode)/jsonRates.getDouble("GBP");
-                current_country.currency.toHKD=jsonRates.getDouble(current_country.moneyCode)/jsonRates.getDouble("HKD");
-                current_country.currency.toJPY=jsonRates.getDouble(current_country.moneyCode)/jsonRates.getDouble("JPY");
-                current_country.currency.toRUB=jsonRates.getDouble(current_country.moneyCode)/jsonRates.getDouble("RUB");
-                current_country.currency.toUSD=jsonRates.getDouble(current_country.moneyCode)/jsonRates.getDouble("USD");
+                current_country.currency.toAUD=jsonRates.getDouble("AUD")/jsonRates.getDouble(current_country.moneyCode);
+                current_country.currency.toCAD=jsonRates.getDouble("CAD")/jsonRates.getDouble(current_country.moneyCode);
+                current_country.currency.toCNY=jsonRates.getDouble("CNY")/jsonRates.getDouble(current_country.moneyCode);
+                current_country.currency.toEUR=jsonRates.getDouble("EUR")/jsonRates.getDouble(current_country.moneyCode);
+                current_country.currency.toGBP=jsonRates.getDouble("GBP")/jsonRates.getDouble(current_country.moneyCode);
+                current_country.currency.toHKD=jsonRates.getDouble("HKD")/jsonRates.getDouble(current_country.moneyCode);
+                current_country.currency.toJPY=jsonRates.getDouble("JPY")/jsonRates.getDouble(current_country.moneyCode);
+                current_country.currency.toRUB=jsonRates.getDouble("RUB")/jsonRates.getDouble(current_country.moneyCode);
+                current_country.currency.toUSD=jsonRates.getDouble("USD")/jsonRates.getDouble(current_country.moneyCode);
+
+                ContentValues records=new ContentValues();
+                records.put("countryId",current_country.getCountryId());
+                records.put("moneyCode",current_country.getMoneyCode());
+                records.put("countryName",current_country.getCountryName());
+                SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                Date curDate = new Date(System.currentTimeMillis());//获取当前时间
+                String date = sDateFormat.format(curDate);
+                records.put("time",date);
+                db.insert("searchRecords",null,records);
+                Toast.makeText(getContext(), "JSON,数据库数据加载完成",Toast.LENGTH_SHORT).show();
             } catch (JSONException e) {
 
                 e.printStackTrace();

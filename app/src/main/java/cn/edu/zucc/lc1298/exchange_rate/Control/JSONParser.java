@@ -24,7 +24,9 @@ public class JSONParser {
     static InputStream sInputStream = null;
     static JSONObject sReturnJsonObject = null;
     static String sRawJsonString = "";
-    public JSONParser() {}
+    public JSONObject jsonObject=null;
+
+
     public JSONObject getJSONFromUrl(String url) {
 //attempt to get response from server
         try {

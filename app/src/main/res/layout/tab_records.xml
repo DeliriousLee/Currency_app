@@ -1,41 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="#ffffff">
-   <LinearLayout
+    <LinearLayout
        android:id="@+id/Lin_search"
        android:layout_width="match_parent"
-       android:layout_height="72dp"
+       android:layout_height="56dp"
        android:orientation="horizontal"
-       android:background="#ffffff"
-       android:paddingRight="16dp">
+       android:background="#bdbdbd">
+        <SearchView
+            android:id="@+id/src_searchInput"
+            android:layout_width="275dp"
+            android:layout_height="match_parent"
+            android:gravity="left"
+            android:queryHint="请输入搜索内容"
+            android:background="@drawable/search_pic_01"
+            android:elevation="5dp"
+            android:visibility="visible"></SearchView>
+        <Spinner
+            android:popupElevation="6dp"
+            android:spinnerMode="dropdown"
+            android:id="@+id/spn_history"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_gravity="center"
+            android:background="@drawable/dropdown_04"
+            android:entries="@array/search_item"
+            android:gravity="center"
+            android:popupBackground="@drawable/round_corner"
+            android:textAlignment="center"
+           >
 
-       <TextView
+        </Spinner>
 
-           android:background="@color/primary_dark"
-           android:id="@+id/textView3"
-           android:layout_width="70dp"
-           android:layout_height="84dp"
-           android:layout_gravity="center"
-           android:gravity="center"
-           android:textColor="#fff"
-           android:text="RESEARCH"
-           android:textStyle="bold"
-           android:textSize="12dp"/>
-
-       <EditText
-           android:id="@+id/edt_records"
-           android:layout_width="match_parent"
-           android:layout_height="match_parent"
-           android:hint="请输入查询条件"
-           android:textColorHint="#bdbdbd"
-           android:textColor="#000"
-           android:paddingRight="16dp"
-           android:textSize="20dp"
-           android:gravity="right"
-           android:inputType="textCapCharacters"
-        />
-   </LinearLayout>
+    </LinearLayout>
+     <LinearLayout
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_below="@+id/Lin_search"
+         android:id="@+id/Lin_option"
+         android:background="@color/primary">
 
         <TextView
             android:id="@+id/txt_search"
@@ -43,17 +49,19 @@
             android:layout_height="56dp"
             android:background="@color/primary"
             android:layout_below="@+id/Lin_search"
-            android:text="查询结果"
-            android:paddingLeft="16dp"
-            android:textSize="18dp"
+            android:text="@string/txt_search"
+            android:paddingStart="16dp"
+            android:textSize="18sp"
             android:gravity="center_vertical"
-            android:elevation="5dp"
+            android:elevation="2dp"
             android:textColor="#ffffff"/>
+     </LinearLayout>
 
+        <ListView
 
-    <ListView
-        android:id="@+id/list_records"
-        android:layout_below="@+id/txt_search"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></ListView>
+             android:divider="@color/divider"
+             android:id="@+id/list_records"
+             android:layout_below="@+id/Lin_option"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"></ListView>
 </RelativeLayout>
